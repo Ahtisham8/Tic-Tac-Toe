@@ -1,3 +1,5 @@
+package org.example; 
+
 import java.util.Scanner;
 
 public class TicTacToe {
@@ -6,17 +8,64 @@ public class TicTacToe {
         char[][] board = {{'1', '2', '3'}, 
                         {'4', '5', '6'},                    
                         {'7', '8', '9'}};
-        
         Scanner scanner = new Scanner(System.in);
+        
+        gameMenu(board, scanner);
+
+
+            
+    }
+
+    private static void playerVsComputer(char[][] board, Scanner scanner)
+    {
+        
+    }
+
+    private static void gameMenu(char[][] board, Scanner scanner) {
+        System.out.println("Welcome to Tic-Tac-Toe:\n");
+        System.out.println("Please choose a game mode:\n");
+        System.out.println("(1) Human vs. human ");
+        System.out.println("(2) Human vs. computer \n");
+
+        int gameMode = scanner.nextInt();
+        boolean validMode = true;
+
+        if (gameMode == 1) {
+            playerVsPlayer(board, scanner); 
+            validMode = false;   
+        }
+        else if (gameMode == 2) {
+            playerVsComputer(board, scanner);
+            validMode = false;
+        }
+
+        while (validMode) {
+            System.out.println("This is not a valid choice\n");
+            System.out.println("Please choose a game mode:\n");
+            System.out.println("(1) Human vs. human");
+            System.out.println("(2) Human vs. computer \n");
+            gameMode = scanner.nextInt();
+
+            if (gameMode == 1) {
+                validMode = false;
+                playerVsPlayer(board, scanner); 
+            }
+            else if (gameMode == 2) {
+                validMode = false;
+            }
+        }
+    }
+
+
+
+    private static void playerVsPlayer(char[][] board, Scanner scanner) {
         int playerOneMove;
         int playerTwoMove;
         
-        System.out.println("Tic-Tac-Toe:\n\n");
-        printBoard(board);
 
         while (true) {
 
-            
+            printBoard(board);
             System.out.println("Player one(X) - where would you like to move?");
             playerOneMove = scanner.nextInt();
 
@@ -48,16 +97,18 @@ public class TicTacToe {
                 break;
             }
             printBoard(board);
-        }        
+        }
     }
+
+    
 
     public static void printBoard(char[][] board)
     {
-        System.out.println("\n" + board[0][0] + " | " + board[0][1] + " | " + board[0][2] + " | ");
+        System.out.println("\n" + board[0][0] + " | " + board[0][1] + " | " + board[0][2]);
         System.out.println("-----------");
-        System.out.println(board[1][0] + " | " + board[1][1] + " | " + board[1][2] + " | ");
+        System.out.println(board[1][0] + " | " + board[1][1] + " | " + board[1][2]);
         System.out.println("-----------");
-        System.out.println(board[2][0] + " | " + board[2][1] + " | " + board[2][2] + " | \n");
+        System.out.println(board[2][0] + " | " + board[2][1] + " | " + board[2][2] + "\n");
     }
 
     public static void makeMovePlayerOne(int spot, char[][] board)
