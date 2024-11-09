@@ -1,5 +1,7 @@
 package org.example; 
 
+import java.util.InputMismatchException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class TicTacToe {
@@ -18,7 +20,40 @@ public class TicTacToe {
 
     private static void playerVsComputer(char[][] board, Scanner scanner)
     {
+
+        System.out.println("Let's Begin: \n");
+        int computerTurn = 0;
+        computerTurn = generateComputerMove(board, computerTurn);
+
+        while (true) {
+            printBoard(board);
+            playerOneTurn(scanner, board);
+
+            if (isGameDone(board, "The computer player")) {
+                break;
+            }
+
+            computerTurn = generateComputerMove(board, computerTurn);
+            makeComputerOrPlayerTwoMove(computerTurn, board);
+            System.out.println("The computer has moved in space " + computerTurn);
+
+            if (isGameDone(board, "The computer player")) {
+                break;
+            } 
+            
+        }
+    }
+
+    private static int generateComputerMove(char[][] board, int computerTurn)
+    {
+        Random rand = new Random();
         
+        while (true) {
+            computerTurn = rand.nextInt(9) + 1;
+            if (validSpot(computerTurn, board)) {
+                return computerTurn;
+            }
+        }
     }
 
     private static void gameMenu(char[][] board, Scanner scanner) {
@@ -26,64 +61,184 @@ public class TicTacToe {
         System.out.println("Please choose a game mode:\n");
         System.out.println("(1) Human vs. human ");
         System.out.println("(2) Human vs. computer \n");
-
-        int gameMode = scanner.nextInt();
         boolean validMode = true;
+        boolean repeatExitMenu = true;
+        int gameMode = 0;
 
+        gameMode = validateNumber(scanner, gameMode);
+      
+
+        //If user picks valid game mode
         if (gameMode == 1) {
             playerVsPlayer(board, scanner); 
-            validMode = false;   
+            validMode = false;  
+            resetBoard(board);
+            while (repeatExitMenu) {
+                repeatExitMenu = exitMenu(scanner, gameMode, board, repeatExitMenu);
+                resetBoard(board);
+            }
+            
         }
         else if (gameMode == 2) {
             playerVsComputer(board, scanner);
             validMode = false;
+            resetBoard(board);
+            while (repeatExitMenu) {
+                repeatExitMenu = exitMenu(scanner, gameMode, board, repeatExitMenu);
+                resetBoard(board);
+            }
         }
 
+        //If User enters wrong game mode option
         while (validMode) {
-            System.out.println("This is not a valid choice\n");
+            System.out.println("\nThis is not a valid choice\n");
             System.out.println("Please choose a game mode:\n");
             System.out.println("(1) Human vs. human");
             System.out.println("(2) Human vs. computer \n");
-            gameMode = scanner.nextInt();
 
+            gameMode = validateNumber(scanner, gameMode);
+            
+            
             if (gameMode == 1) {
                 validMode = false;
-                playerVsPlayer(board, scanner); 
+                playerVsPlayer(board, scanner);
+                resetBoard(board);
+                while (repeatExitMenu) {
+                    repeatExitMenu = exitMenu(scanner, gameMode, board, repeatExitMenu);
+                    resetBoard(board);
+                }
+                
             }
             else if (gameMode == 2) {
                 validMode = false;
+                playerVsComputer(board, scanner);
+                resetBoard(board);
+                while (repeatExitMenu) {
+                    repeatExitMenu = exitMenu(scanner, gameMode, board, repeatExitMenu);
+                    resetBoard(board);
+                }
+                
             }
         }
     }
 
+    
+
+    private static boolean exitMenu(Scanner scanner, int gameType, char[][] board, boolean repeatExitMenu)
+    {
+        System.out.println("\nWould you like to play again?\n");
+        System.out.println("(1) Yes\n(2) No\n");
+        boolean repeatPrompt = true;
+        int input = 0;
+        input = validateNumber(scanner, input);
+
+        if (input == 1) {
+            if (gameType == 1) {
+                repeatExitMenu = true;
+                playerVsPlayer(board, scanner);
+                repeatPrompt = false;
+            }
+            else if(gameType == 2)
+            {
+                repeatExitMenu = true;
+                repeatPrompt = false;
+                playerVsComputer(board, scanner);
+            }
+                
+        }
+        if (input == 2) {
+            
+            System.out.println("\nGoodbye!\n");
+            repeatPrompt = false;
+            repeatExitMenu = false;
+            
+        }
+         
+        while (repeatPrompt) {
+            System.out.println("\nYour selection was invalid, please try again!");
+            System.out.println("Would you like to play again?\n");
+            System.out.println("(1) Yes\n(2) No\n");
+
+            input = validateNumber(scanner, input);
+
+            if (input == 1) {
+                if (gameType == 1) {
+                    repeatExitMenu = true;
+                    playerVsPlayer(board, scanner);
+                    repeatPrompt = false;
+                    break;
+                }
+                else if(gameType == 2)
+                {
+                    repeatExitMenu = true;
+                    repeatPrompt = false;
+                    playerVsComputer(board, scanner);
+                    break;
+                }
+                    
+            }
+            else if (input == 2) {
+                System.out.println("\nGoodbye!\n");
+                repeatPrompt = false;
+                repeatExitMenu = false;
+                break;
+            }
+
+        }
+
+        return repeatExitMenu;
+    }
+
+
+    public static int validateNumber(Scanner scanner, int num) 
+    { 
+    
+        while(!scanner.hasNextInt()) {
+            System.out.println("\nThat was not a valid number, please try again!\n");
+            scanner.next();
+        }
+
+        num = scanner.nextInt();
+
+        return num;
+    }
+
+
+    private static void playerOneTurn(Scanner scanner, char[][] board)
+    {
+        
+        System.out.println("Player one(X) - where would you like to move?");
+        int playerOneMove = 0;
+        playerOneMove = validateNumber(scanner, playerOneMove);
+
+        while(!validSpot(playerOneMove, board))
+        {
+                System.out.println("That move is invalid!");
+                System.out.println("Player one(X) - where would you like to move?");
+                playerOneMove = scanner.nextInt();
+        }
+
+        makeMovePlayerOne(playerOneMove, board);
+        
+        printBoard(board);
+    }
 
 
     private static void playerVsPlayer(char[][] board, Scanner scanner) {
         int playerOneMove;
-        int playerTwoMove;
-        
+        int playerTwoMove = 0;
+        System.out.println("Let's Begin!\n");
 
         while (true) {
-
             printBoard(board);
-            System.out.println("Player one(X) - where would you like to move?");
-            playerOneMove = scanner.nextInt();
+            playerOneTurn(scanner, board);
 
-            while(!validSpot(playerOneMove, board))
-            {
-                    System.out.println("That move is invalid!");
-                    System.out.println("Player one(X) - where would you like to move?");
-                    playerOneMove = scanner.nextInt();
-            }
-
-            makeMovePlayerOne(playerOneMove, board);
-            if (isGameDone(board)) {
+            if (isGameDone(board, "Player two")) {
                 break;
             }
-            printBoard(board);
 
             System.out.println("Player two(O) - where would you like to move?");
-            playerTwoMove = scanner.nextInt();
+            playerTwoMove = validateNumber(scanner, playerTwoMove);
 
             while(!validSpot(playerTwoMove, board))
             {
@@ -92,11 +247,11 @@ public class TicTacToe {
                     playerTwoMove = scanner.nextInt();
             }
 
-            makeMovePlayerTwo(playerTwoMove, board);
-            if (isGameDone(board)) {
+            makeComputerOrPlayerTwoMove(playerTwoMove, board);
+            if (isGameDone(board, "Player two")) {
                 break;
             }
-            printBoard(board);
+            
         }
     }
 
@@ -105,10 +260,23 @@ public class TicTacToe {
     public static void printBoard(char[][] board)
     {
         System.out.println("\n" + board[0][0] + " | " + board[0][1] + " | " + board[0][2]);
-        System.out.println("-----------");
+        System.out.println("----------");
         System.out.println(board[1][0] + " | " + board[1][1] + " | " + board[1][2]);
-        System.out.println("-----------");
+        System.out.println("----------");
         System.out.println(board[2][0] + " | " + board[2][1] + " | " + board[2][2] + "\n");
+    }
+
+    public static void resetBoard(char[][] board)
+    {
+        board[0][0] = '1';
+        board[0][1] = '2';
+        board[0][2] = '3';
+        board[1][0] = '4';
+        board[1][1] = '5';
+        board[1][2] = '6';
+        board[2][0] = '7';
+        board[2][1] = '8';
+        board[2][2] = '9';
     }
 
     public static void makeMovePlayerOne(int spot, char[][] board)
@@ -153,7 +321,7 @@ public class TicTacToe {
         }
     }
 
-    public static void makeMovePlayerTwo(int spot, char[][] board)
+    public static void makeComputerOrPlayerTwoMove(int spot, char[][] board)
     {
         switch (spot) {
             case 1:
@@ -219,9 +387,11 @@ public class TicTacToe {
             default:
                 return false;
         }
+
+        
     }
 
-    public static Boolean isGameDone(char[][] board)
+    public static Boolean isGameDone(char[][] board, String secondPlayerName)
     {   
 
         if (board[0][0] == 'X' && board[0][1] == 'X' && board[0][2] == 'X' ||
@@ -235,8 +405,9 @@ public class TicTacToe {
             board[0][0] == 'X' && board[1][1] == 'X' && board[2][2] == 'X' ||
             board[0][2] == 'X' && board[1][1] == 'X' && board[2][0] == 'X')
         {
-            printBoard(board);
-            System.out.println("Player One has won the game!\nThanks for playing!\n");
+            
+            
+            System.out.println("Player One has won the game!");
             return true;
         }
 
@@ -251,8 +422,8 @@ public class TicTacToe {
             board[0][0] == 'O' && board[1][1] == 'O' && board[2][2] == 'O' ||
             board[0][2] == 'O' && board[1][1] == 'O' && board[2][0] == 'O')
         {
-            printBoard(board);
-            System.out.println("Player Two has won the game!\nThanks for playing!\n");
+            
+            System.out.println("" + secondPlayerName + " has won the game!");
             return true;
         }
 
@@ -266,8 +437,13 @@ public class TicTacToe {
             }
         }
         
-        System.out.println("\n\nThe game is a tie!\nThanks for playing!\n");
-        printBoard(board);
+        
+        System.out.println("The game is a tie!");
         return true;
     }
 }
+
+
+
+
+
