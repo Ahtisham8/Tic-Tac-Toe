@@ -5,39 +5,42 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class TicTacToe {
-    public static void main(String[] args) {
-        
-        char[][] board = {{'1', '2', '3'}, 
-                        {'4', '5', '6'},                    
-                        {'7', '8', '9'}};
-        Scanner scanner = new Scanner(System.in);
-        
-        gameMenu(board, scanner);
 
-
+    static char playerOneMark = 'X';
+    static char playerTwoMark = 'O';
+        public static void main(String[] args) {
             
-    }
-
-    private static void playerVsComputer(char[][] board, Scanner scanner)
-    {
-
-        System.out.println("Let's Begin: \n");
-        int computerTurn = 0;
-        computerTurn = generateComputerMove(board, computerTurn);
-
-        while (true) {
-            printBoard(board);
-            playerOneTurn(scanner, board);
-
-            if (isGameDone(board, "The computer player")) {
-                break;
-            }
-
+            char[][] board = {{'1', '2', '3'}, 
+                            {'4', '5', '6'},                    
+                            {'7', '8', '9'}};
+            Scanner scanner = new Scanner(System.in);
+            
+            gameMenu(board, scanner);
+    
+    
+                
+        }
+    
+        private static void playerVsComputer(char[][] board, Scanner scanner)
+        {
+    
+            System.out.println("Let's Begin: \n");
+            int computerTurn = 0;
             computerTurn = generateComputerMove(board, computerTurn);
-            makeComputerOrPlayerTwoMove(computerTurn, board);
+    
+            while (true) {
+                printBoard(board);
+                playerOneTurn(scanner, board);
+    
+                if (isGameDone(board, "The computer player", playerOneMark, playerTwoMark)) {
+                    break;
+                }
+    
+                computerTurn = generateComputerMove(board, computerTurn);
+                makeComputerOrPlayerTwoMove(computerTurn, board, playerTwoMark);
             System.out.println("The computer has moved in space " + computerTurn);
 
-            if (isGameDone(board, "The computer player")) {
+            if (isGameDone(board, "The computer player", playerOneMark, playerTwoMark)) {
                 break;
             } 
             
@@ -56,9 +59,64 @@ public class TicTacToe {
         }
     }
 
+    private static void customCharacterPrompt(Scanner scanner)
+    {
+        boolean sameChar = false;
+        System.out.println("Please choose the custom player marks:\n");
+        System.out.println("Custom mark for Player One: ");
+        String playerInput = scanner.nextLine();
+        playerOneMark = validateCustomCharacter(scanner, playerInput);
+
+        System.out.println("Custom mark for Player Two/Computer: ");
+        playerInput = scanner.nextLine();
+        playerTwoMark = validateCustomCharacter(scanner, playerInput);
+
+        if (playerOneMark == playerTwoMark) {
+            sameChar = true;
+        }
+        while(sameChar)
+        {
+            System.out.println("Please choose a different mark for Player Two/Computer: ");
+            playerTwoMark = scanner.next().charAt(0);
+
+            if (playerOneMark != playerTwoMark) {
+                sameChar = false;
+            }
+        }
+    }
+
+    private static char validateCustomCharacter(Scanner scanner, String customMark)
+    {       
+        boolean invalidEntry = true;
+        char customChar;
+
+        while (invalidEntry) {
+            if (customMark.length() != 1) {
+                System.out.println("That was not a valid Character, please try again:");
+                customMark = scanner.nextLine();
+
+            }
+            
+            if (customMark.trim().isEmpty()) {
+                System.out.println("You cannot enter any whitespaces, please try again:");
+                customMark = scanner.nextLine();
+            }
+
+            if (customMark.length() == 1 && !customMark.trim().isEmpty()) {
+                invalidEntry = false;
+                break;
+            }
+        }
+
+        customChar = customMark.charAt(0);
+
+        return customChar;
+    }
+
     private static void gameMenu(char[][] board, Scanner scanner) {
         System.out.println("Welcome to Tic-Tac-Toe:\n");
-        System.out.println("Please choose a game mode:\n");
+        customCharacterPrompt(scanner);
+        System.out.println("\n\nPlease choose a game mode:\n");
         System.out.println("(1) Human vs. human ");
         System.out.println("(2) Human vs. computer \n");
         boolean validMode = true;
@@ -218,7 +276,7 @@ public class TicTacToe {
                 playerOneMove = scanner.nextInt();
         }
 
-        makeMovePlayerOne(playerOneMove, board);
+        makeMovePlayerOne(playerOneMove, board, playerOneMark);
         
         printBoard(board);
     }
@@ -233,7 +291,7 @@ public class TicTacToe {
             printBoard(board);
             playerOneTurn(scanner, board);
 
-            if (isGameDone(board, "Player two")) {
+            if (isGameDone(board, "Player two", playerOneMark, playerTwoMark)) {
                 break;
             }
 
@@ -247,8 +305,8 @@ public class TicTacToe {
                     playerTwoMove = scanner.nextInt();
             }
 
-            makeComputerOrPlayerTwoMove(playerTwoMove, board);
-            if (isGameDone(board, "Player two")) {
+            makeComputerOrPlayerTwoMove(playerTwoMove, board, playerTwoMark);
+            if (isGameDone(board, "Player two", playerOneMark, playerTwoMark)) {
                 break;
             }
             
@@ -279,85 +337,85 @@ public class TicTacToe {
         board[2][2] = '9';
     }
 
-    public static void makeMovePlayerOne(int spot, char[][] board)
+    public static void makeMovePlayerOne(int spot, char[][] board, char playerOneMark)
     {
         switch (spot) {
             case 1:
-                board[0][0] = 'X';
+                board[0][0] = playerOneMark;
                 break;
 
             case 2:
-                board[0][1] = 'X';
+                board[0][1] = playerOneMark;
                 break;   
 
             case 3:
-                board[0][2] = 'X';
+                board[0][2] = playerOneMark;
                 break;
                 
             case 4:
-                board[1][0] = 'X';
+                board[1][0] = playerOneMark;
                 break;  
 
             case 5:
-                board[1][1] = 'X';
+                board[1][1] = playerOneMark;
                 break;
 
             case 6:
-                board[1][2] = 'X';
+                board[1][2] = playerOneMark;
                 break;   
 
             case 7:
-                board[2][0] = 'X';
+                board[2][0] = playerOneMark;
                 break;
                 
             case 8:
-                board[2][1] = 'X';
+                board[2][1] = playerOneMark;
                 break;
 
             case 9:
-                board[2][2] = 'X';
+                board[2][2] = playerOneMark;
                 break;
     
         }
     }
 
-    public static void makeComputerOrPlayerTwoMove(int spot, char[][] board)
+    public static void makeComputerOrPlayerTwoMove(int spot, char[][] board, char playerTwoMark)
     {
         switch (spot) {
             case 1:
-                board[0][0] = 'O';
+                board[0][0] = playerTwoMark;
                 break;
 
             case 2:
-                board[0][1] = 'O';
+                board[0][1] = playerTwoMark;
                 break;   
 
             case 3:
-                board[0][2] = 'O';
+                board[0][2] = playerTwoMark;
                 break;
                 
             case 4:
-                board[1][0] = 'O';
+                board[1][0] = playerTwoMark;
                 break;  
 
             case 5:
-                board[1][1] = 'O';
+                board[1][1] = playerTwoMark;
                 break;
 
             case 6:
-                board[1][2] = 'O';
+                board[1][2] = playerTwoMark;
                 break;   
 
             case 7:
-                board[2][0] = 'O';
+                board[2][0] = playerTwoMark;
                 break;
                 
             case 8:
-                board[2][1] = 'O';
+                board[2][1] = playerTwoMark;
                 break;
 
             case 9:
-                board[2][2] = 'O';
+                board[2][2] = playerTwoMark;
                 break;
     
         }
@@ -391,19 +449,19 @@ public class TicTacToe {
         
     }
 
-    public static Boolean isGameDone(char[][] board, String secondPlayerName)
+    public static Boolean isGameDone(char[][] board, String secondPlayerName, char playerOneMark, char playerTwoMark)
     {   
+        //if player one won
+        if (board[0][0] == playerOneMark && board[0][1] == playerOneMark && board[0][2] == playerOneMark ||
+            board[1][0] == playerOneMark && board[1][1] == playerOneMark && board[1][2] == playerOneMark ||
+            board[2][0] == playerOneMark && board[2][1] == playerOneMark && board[2][2] == playerOneMark ||
 
-        if (board[0][0] == 'X' && board[0][1] == 'X' && board[0][2] == 'X' ||
-            board[1][0] == 'X' && board[1][1] == 'X' && board[1][2] == 'X' ||
-            board[2][0] == 'X' && board[2][1] == 'X' && board[2][2] == 'X' ||
+            board[0][0] == playerOneMark && board[1][0] == playerOneMark && board[2][0] == playerOneMark ||
+            board[0][1] == playerOneMark && board[1][1] == playerOneMark && board[2][1] == playerOneMark ||
+            board[0][2] == playerOneMark && board[1][2] == playerOneMark && board[2][2] == playerOneMark ||
 
-            board[0][0] == 'X' && board[1][0] == 'X' && board[2][0] == 'X' ||
-            board[0][1] == 'X' && board[1][1] == 'X' && board[2][1] == 'X' ||
-            board[0][2] == 'X' && board[1][2] == 'X' && board[2][2] == 'X' ||
-
-            board[0][0] == 'X' && board[1][1] == 'X' && board[2][2] == 'X' ||
-            board[0][2] == 'X' && board[1][1] == 'X' && board[2][0] == 'X')
+            board[0][0] == playerOneMark && board[1][1] == playerOneMark && board[2][2] == playerOneMark ||
+            board[0][2] == playerOneMark && board[1][1] == playerOneMark && board[2][0] == playerOneMark)
         {
             
             
@@ -411,27 +469,30 @@ public class TicTacToe {
             return true;
         }
 
-        if (board[0][0] == 'O' && board[0][1] == 'O' && board[0][2] == 'O' ||
-            board[1][0] == 'O' && board[1][1] == 'O' && board[1][2] == 'O' ||
-            board[2][0] == 'O' && board[2][1] == 'O' && board[2][2] == 'O' ||
+        //if player two wins
+        if (board[0][0] == playerTwoMark && board[0][1] == playerTwoMark && board[0][2] == playerTwoMark ||
+            board[1][0] == playerTwoMark && board[1][1] == playerTwoMark && board[1][2] == playerTwoMark ||
+            board[2][0] == playerTwoMark && board[2][1] == playerTwoMark && board[2][2] == playerTwoMark ||
 
-            board[0][0] == 'O' && board[1][0] == 'O' && board[2][0] == 'O' ||
-            board[0][1] == 'O' && board[1][1] == 'O' && board[2][1] == 'O' ||
-            board[0][2] == 'O' && board[1][2] == 'O' && board[2][2] == 'O' ||
+            board[0][0] == playerTwoMark && board[1][0] == playerTwoMark && board[2][0] == playerTwoMark ||
+            board[0][1] == playerTwoMark && board[1][1] == playerTwoMark && board[2][1] == playerTwoMark ||
+            board[0][2] == playerTwoMark && board[1][2] == playerTwoMark && board[2][2] == playerTwoMark ||
 
-            board[0][0] == 'O' && board[1][1] == 'O' && board[2][2] == 'O' ||
-            board[0][2] == 'O' && board[1][1] == 'O' && board[2][0] == 'O')
+            board[0][0] == playerTwoMark && board[1][1] == playerTwoMark && board[2][2] == playerTwoMark ||
+            board[0][2] == playerTwoMark && board[1][1] == playerTwoMark && board[2][0] == playerTwoMark)
         {
             
             System.out.println("" + secondPlayerName + " has won the game!");
+            printBoard(board);
             return true;
         }
 
+        //if tie
         for(int i = 0; i < board.length; i++)
         {
             for(int j = 0; j < board.length; j++)
             {
-                if (board[i][j] != 'X' && board[i][j] != 'O') {
+                if (board[i][j] != playerOneMark && board[i][j] != playerTwoMark) {
                     return false;
                 }
             }
@@ -439,6 +500,7 @@ public class TicTacToe {
         
         
         System.out.println("The game is a tie!");
+        printBoard(board);
         return true;
     }
 }
